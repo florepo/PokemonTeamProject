@@ -2,8 +2,8 @@ const BASE_URL = "http://localhost:3000"
 const TRAINERS_URL = `${BASE_URL}/trainers`
 const POKEMONS_URL = `${BASE_URL}/pokemons`
 
-
 const main = document.querySelector("main")
+
 
 fetchTrainers()
 
@@ -13,41 +13,28 @@ function fetchTrainers(){
         .then(jsonObject => renderTrainers(jsonObject))
 }
 
+function fetchPokemons(){
+    return fetch(POKEMONS_URL)
+        .then(response => response.json())
+}
+
 function renderTrainers(jsonTrainers){
-    console.log(jsonTrainers)
+    // console.log(jsonTrainers)
     for(let i = 0; i < jsonTrainers.length; i++) {
+
         createCard(jsonTrainers[i])
     }
 }
 
-function fetchTrainerPokemons(){
-    return fetch(POKEMONS_URL)
-        .then(response => response.json())
-        .then(jsonObject => pokemonsForTrainer(jsonObject))
-}
-
-function pokemonsForTrainer(jsonPokemons){
-
-    let collection = []
-    trainer_id = 1
-    jsonPokemons.forEach( pokemon => {
-         if (trainer_id  === pokemon.trainer_id ) { 
-             collection.push(pokemon)
-         }
-     })
-     return collection
-}
-
-
-
-
 function createCard(trainer) {
+    // console.log(trainer)
+    // console.log(trainer.pokemons)
+    
+    let card = document.createElement("div")
+    card.setAttribute("class", "card");
+    card.setAttribute("data-id", `${trainer.id}`);
 
-    let container = document.createElement("div")
-    container.setAttribute("class", "card");
-    container.setAttribute("data-id", `${trainer.id}`);
-
-    main.append(container)
+    main.append(card)
 
     let p = document.createElement("p")
     p.innerText = `${trainer.name}`
@@ -56,29 +43,30 @@ function createCard(trainer) {
     addButton.innerText = "Add Pokemon"
     addButton.setAttribute("data-trainer-id", `${trainer.id}`);
 
-    let uList = document.createElement("ul")
-    
-    container.append(p,addButton, uList)
+    card.append(p,addButton)
 
-    let jsonPokemons = fetchTrainerPokemons()
-    console.log(jsonPokemons)
-    
-    for(let i = 0; i < jsonPokemons.length; i++) {
-        createListitem(jsonPokemons[i])
-    }
+    const uList = document.createElement("ul")
+    card.append(uList)
+
+    for(let i = 0; i < trainer.pokemons.length; i++) {
+        renderListitem(trainer.pokemons[i])
+       
 }
 
-function createListitem(pokemon){
-
+function renderListitem(pokemon){
+    console.log(pokemon.nickname)
+    
     let li = document.createElement("li")
-    let releaseButton = document.createElement("BUTTON")
+    li.innerHTML = `${pokemon.species} (${pokemon.nickname})` 
 
+    let releaseButton = document.createElement("BUTTON")
     releaseButton.innerText = "Release"
     releaseButton.setAttribute("class", `release`);
+    releaseButton.setAttribute("data-pokemon-id", `${pokemon.id}`);
 
-    //releaseButton.setAttribute("data-pokemon-id", `${pokemon.id}`);
-    //li.innerHTML = `${pokemon.species} (${pokemon.nickname})` 
-
-    uList.append(li, releaseButton)
+    li.append(releaseButton)
+    uList.append(li)
+    }
+    
 
 }
